@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeowMood · History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1A1614;--bg2:#0F0D0B;--bg3:#221e1b;--text:#FFF8EB;--muted:rgba(255,248,235,0.45);--acc:#E8976A;--border:rgba(255,248,235,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}button{font-family:'DM Sans',system-ui,sans-serif;cursor:pointer}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,248,235,0.1);border-radius:2px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:72px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;flex-shrink:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1)}
+.sb.open{width:200px;align-items:stretch;padding:12px 8px}
+.sb-top{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid rgba(255,248,235,0.07);margin-bottom:8px;width:100%;justify-content:center}
+.sb.open .sb-top{justify-content:flex-start;padding:0 4px 12px}
+.sb-paw{width:32px;height:32px;flex-shrink:0;background:rgba(244,200,66,0.15);border:1px solid rgba(244,200,66,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:background .2s}
+.sb-paw:hover{background:rgba(244,200,66,0.28)}
+.sb-brand{font-family:'DM Serif Display',serif;font-size:14px;white-space:nowrap;opacity:0;max-width:0;overflow:hidden;transition:max-width .25s cubic-bezier(.4,0,.2,1), opacity .15s}
+.sb.open .sb-brand{opacity:1;max-width:160px}
+.sb-nav{display:flex;flex-direction:column;gap:2px;width:100%;flex:1}
+.sb-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;border-radius:10px;border:none;background:transparent;color:rgba(255,248,235,0.45);width:100%;cursor:pointer;transition:background .2s,color .2s}
+.sb.open .sb-item{flex-direction:row;justify-content:flex-start;padding:9px 10px;gap:10px}
+.sb-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,248,235,0.8)}
+.sb-item.active{background:rgba(232,151,106,0.14);color:var(--acc)}
+.sb-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.sb.open .sb-lbl{font-size:12px;text-transform:none;letter-spacing:0}
+.sb-bottom{margin-top:auto;width:100%}
+.sb-out{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;border-radius:10px;border:none;background:transparent;color:rgba(224,90,90,0.5);width:100%;cursor:pointer;transition:background .2s,color .2s}
+.sb.open .sb-out{flex-direction:row;justify-content:flex-start;padding:9px 10px;gap:10px}
+.sb-out:hover{background:rgba(224,90,90,0.08);color:#e05a5a}
+.sb-out svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:52px;flex-shrink:0;border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:baseline;gap:10px}
+.tb-title{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400}
+.tb-sub{font-size:11px;color:var(--muted)}
+.tb-r{display:flex;align-items:center;gap:10px}
+.uc{display:flex;align-items:center;gap:7px}.ua{width:26px;height:26px;border-radius:50%;background:rgba(232,151,106,0.18);border:1px solid rgba(232,151,106,0.28);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--acc)}.un{font-size:11px;color:var(--muted)}
+.content{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:14px}
+.back-link{font-size:11px;color:rgba(255,248,235,0.35);display:inline-flex;align-items:center;gap:4px}
+.back-link:hover{color:var(--acc)}
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px}
+.fpill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);font-size:11px;cursor:pointer;transition:all .2s}
+.fpill:hover{border-color:rgba(232,151,106,0.3);color:rgba(255,248,235,0.7)}
+.fpill.active{background:rgba(232,151,106,0.14);color:var(--acc);border-color:rgba(232,151,106,0.3)}
+.mini-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.msc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.msc-n{font-family:'DM Serif Display',serif;font-size:20px;line-height:1}
+.msc-l{font-size:10px;color:var(--muted);margin-top:2px}
+.table-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.t-head{display:grid;grid-template-columns:36px 70px 1fr 1fr 80px 100px;gap:0;padding:10px 16px;border-bottom:1px solid var(--border)}
+.th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.t-body{display:flex;flex-direction:column}
+.trow{display:grid;grid-template-columns:36px 70px 1fr 1fr 80px 100px;gap:0;padding:9px 16px;border-bottom:1px solid rgba(255,248,235,0.04);align-items:center;transition:background .15s}
+.trow:hover{background:rgba(255,255,255,0.02)}
+.trow:last-child{border-bottom:none}
+.td-n{font-size:11px;color:rgba(255,248,235,.25)}
+.td-type{padding:2px 7px;border-radius:4px;background:rgba(255,248,235,.04);color:rgba(255,248,235,.35);font-size:10px;letter-spacing:.04em;width:fit-content}
+.td-file{font-size:11px;color:rgba(255,248,235,.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-em{font-size:12px;font-weight:400}
+.td-conf{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;width:fit-content}
+.td-date{font-size:11px;color:rgba(255,248,235,.3)}
+.empty-state{display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px;text-align:center}
+.empty-state.show{display:flex}
+.empty-state .em{font-size:28px}
+.empty-state p{font-size:11px;color:rgba(255,248,235,.25)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sb" id="sb">
+  <div class="sb-top"><div class="sb-paw" onclick="toggleSb()">🐾</div><span class="sb-brand">MeowMood</span></div>
+  <nav class="sb-nav">
+    <a href="./dashboard.html" class="sb-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg><span class="sb-lbl">Analyse</span></a>
+    <button class="sb-item active" onclick="toggleSb()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><span class="sb-lbl">History</span></button>
+    <a href="./metrics.html" class="sb-item"><svg viewBox="0 0 24 24"><rect x="3" y="14" width="4" height="7"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="4" width="4" height="17"/></svg><span class="sb-lbl">Metrics</span></a>
+    <a href="./profile.html" class="sb-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="sb-lbl">Profile</span></a>
+  </nav>
+  <div class="sb-bottom"><a href="./login.html" class="sb-out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="sb-lbl">Logout</span></a></div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="tb-l"><span class="tb-title">Your history</span><span class="tb-sub">Every prediction your cat has had.</span></div>
+    <div class="tb-r"><div class="uc"><div class="ua">CL</div><span class="un">Cat Lover</span></div></div>
+  </header>
+  <div class="content">
+    <a href="./dashboard.html" class="back-link">← Back to dashboard</a>
+    <div class="filter-row">
+      <span class="filter-lbl">Filter by</span>
+      <button class="fpill active" data-filter="all">All</button>
+      <button class="fpill" data-filter="happy">Happy</button>
+      <button class="fpill" data-filter="sad">Sad</button>
+      <button class="fpill" data-filter="angry">Angry</button>
+      <button class="fpill" data-filter="scared">Scared</button>
+      <button class="fpill" data-filter="surprised">Surprised</button>
+      <button class="fpill" data-filter="other">Other</button>
+      <button class="fpill" data-filter="IMAGE">Image</button>
+      <button class="fpill" data-filter="AUDIO">Audio</button>
+    </div>
+    <div class="mini-stats">
+      <div class="msc"><div><div class="msc-n">24</div><div class="msc-l">Total analyses</div></div></div>
+      <div class="msc"><div><div class="msc-n">18</div><div class="msc-l">Images</div></div></div>
+      <div class="msc"><div><div class="msc-n">6</div><div class="msc-l">Audio clips</div></div></div>
+    </div>
+    <div class="table-wrap">
+      <div class="t-head"><div class="th">#</div><div class="th">Type</div><div class="th">File</div><div class="th">Emotion</div><div class="th">Confidence</div><div class="th">Date</div></div>
+      <div class="t-body" id="tbody"></div>
+      <div class="empty-state" id="empty"><div class="em">🐱</div><p>No predictions match this filter.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+const C={happy:'#d4a017',sad:'#6b9fd4',angry:'#e05a5a',scared:'#c084fc',surprised:'#34d399',other:'#9b8fd4',IMAGE:'#d4a017',AUDIO:'#6b9fd4'}; // Fallbacks
+const EM={happy:'😸 Happy',sad:'😿 Sad',angry:'😾 Angry',scared:'🙀 Scared',surprised:'😲 Surprised',other:'🐱 Other'};
+let rows=[];
+let activeFilter='all';
+
+async function init() {
+  try {
+    const uRes = await fetch('/api/user', {credentials: 'include'});
+    if (uRes.status === 401) { window.location.href = './login.html'; return; }
+    const user = await uRes.json();
+    const initials = user.name.split(' ').map(n=>n[0]).join('').toUpperCase();
+    document.querySelector('.ua').textContent = initials;
+    document.querySelector('.un').textContent = user.name;
+
+    const hRes = await fetch('/api/history', {credentials: 'include'});
+    rows = await hRes.json();
+    render();
+    updateMiniStats();
+  } catch (err) { console.error(err); }
+}
+
+function updateMiniStats() {
+    const counts = document.querySelectorAll('.msc-n');
+    if(counts.length >= 3) {
+        counts[0].textContent = rows.length;
+        counts[1].textContent = rows.filter(r => r.file_type === 'image').length;
+        counts[2].textContent = rows.filter(r => r.file_type === 'audio').length;
+    }
+}
+
+function toggleSb(){document.getElementById('sb').classList.toggle('open')}
+
+function render(){
+  const tbody=document.getElementById('tbody');tbody.innerHTML='';
+  let filtered=rows.filter(r=>{
+    const f = activeFilter.toLowerCase();
+    if(f==='all')return true;
+    if(f==='image'||f==='audio')return r.file_type===f;
+    return r.emotion.toLowerCase()===f;
+  });
+  
+  const empty = document.getElementById('empty');
+  if(empty) empty.classList.toggle('show', filtered.length===0);
+  
+  filtered.forEach((r,i)=>{
+    const emotionKey = r.emotion.toLowerCase();
+    const color=C[emotionKey] || C.other;
+    const displayName = EM[emotionKey] || (r.emotion + ' 🤔');
+    const tr=document.createElement('div');tr.className='trow';
+    tr.innerHTML=`
+      <div class="td-n">${i+1}</div>
+      <div><span class="td-type">${r.file_type.toUpperCase()}</span></div>
+      <div class="td-file">${r.filename}</div>
+      <div class="td-em" style="color:${color}">${displayName}</div>
+      <div><span class="td-conf" style="background:${color}1f;color:${color}">${r.confidence}%</span></div>
+      <div class="td-date">${r.timestamp}</div>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+document.querySelectorAll('.fpill').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter=btn.dataset.filter || btn.textContent.trim();
+    render();
+  });
+});
+
+init();
+</script>
+</body>
+</html>

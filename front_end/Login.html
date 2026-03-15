@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeowMood | Login</title>
+    <style>
+        :root {
+            --bg-dark: #1A1614;
+            --accent: #E8976A;
+            --text: #FFF8EB;
+            --muted: rgba(255, 248, 235, 0.45);
+            --border: rgba(255, 248, 235, 0.08);
+            --radius-input: 10px;
+            --radius-card: 28px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text);
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 860px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Left Side: Video */
+        .video-side {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .video-panel {
+            aspect-ratio: 4/5;
+            background: rgba(255, 248, 235, 0.02);
+            border: 1.5px solid rgba(232, 151, 106, 0.22);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-panel video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding-left: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .status-text {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 248, 235, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        @media (max-width: 860px) {
+            .video-panel {
+                aspect-ratio: 16/9;
+            }
+        }
+
+        /* Right Side: Auth */
+        .auth-side {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: #F4C842;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .brand-name {
+            font-family: Georgia, serif;
+            font-size: 1.4rem;
+            color: var(--text);
+        }
+
+        .tab-switcher {
+            display: flex;
+            background: rgba(255, 248, 235, 0.04);
+            padding: 0.35rem;
+            border-radius: 100px;
+            margin-bottom: 3rem;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 100px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .form-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            font-family: Georgia, serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .flash-msg {
+            background: rgba(232, 151, 106, 0.12);
+            border: 1px solid rgba(232, 151, 106, 0.22);
+            color: var(--accent);
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-input);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: 0.2rem;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-input);
+            padding: 0.9rem 2.2rem 0.9rem 1rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .field-wrap { position: relative; }
+        .field-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            pointer-events: none;
+            line-height: 1;
+        }
+        .field-error {
+            font-size: 11px;
+            color: #e05a5a;
+            margin-top: 4px;
+            display: none;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(232, 151, 106, 0.5);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .submit-btn {
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: var(--radius-input);
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.88;
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .switch-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        
+        <!-- Left Column: Video Preview -->
+        <div class="video-side">
+            <div class="video-panel">
+                <video autoplay muted loop playsinline>
+                    <source src="./video/cat_ambient.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="live-status">
+                <div class="status-dot"></div>
+                <span class="status-text">live analysis active</span>
+            </div>
+        </div>
+
+        <!-- Right Column: Forms -->
+        <div class="auth-side">
+            <a href="./index.html" class="back-link">← Back to MeowMood</a>
+
+            <div class="brand-row">
+                <div class="brand-icon">🐾</div>
+                <span class="brand-name">MeowMood</span>
+            </div>
+
+            <div class="tab-switcher">
+                <button class="tab-btn active" id="tab-login-btn" onclick="showPanel('login')">Sign in</button>
+                <button class="tab-btn" id="tab-register-btn" onclick="showPanel('register')">Create account</button>
+            </div>
+
+            <!-- Login Panel -->
+            <div id="panel-login" class="form-panel active">
+                <div class="form-header">
+                    <h1>Welcome back.</h1>
+                    <p>Your cat's been waiting.</p>
+                </div>
+                <div id="flash-msg-login" class="flash-msg"></div>
+                <form id="form-login" action="./dashboard.html" method="GET" novalidate>
+                    <div class="field-group">
+                        <label class="field-label">Email Address</label>
+                        <div class="field-wrap">
+                            <input type="email" id="login-email" placeholder="name@email.com">
+                            <span class="field-indicator" id="li-ei"></span>
+                        </div>
+                        <span class="field-error" id="li-ee">Please enter a valid email address</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Password</label>
+                        <div class="field-wrap">
+                            <input type="password" id="login-pw" placeholder="••••••••">
+                        </div>
+                        <span class="field-error" id="li-pe">Password must be at least 6 characters</span>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign in</button>
+                </form>
+                <div class="divider"></div>
+                <p class="form-footer">New to MeowMood? <span class="switch-link" onclick="showPanel('register')">Create one free</span></p>
+            </div>
+
+            <!-- Register Panel -->
+            <div id="panel-register" class="form-panel">
+                <div class="form-header">
+                    <h1>Meet your cat's new analyst.</h1>
+                    <p>Free forever. No credit card.</p>
+                </div>
+                <div id="flash-msg-register" class="flash-msg"></div>
+                <form id="form-register" action="./dashboard.html" method="GET" novalidate>
+                    <div class="field-group">
+                        <label class="field-label">Username</label>
+                        <div class="field-wrap">
+                            <input type="text" id="reg-user" placeholder="meow_master123">
+                        </div>
+                        <span class="field-error" id="ri-ue">Username is required</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Email Address</label>
+                        <div class="field-wrap">
+                            <input type="email" id="reg-email" placeholder="name@email.com">
+                            <span class="field-indicator" id="ri-ei"></span>
+                        </div>
+                        <span class="field-error" id="ri-ee">Please enter a valid email address</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Choose Password</label>
+                        <div class="field-wrap">
+                            <input type="password" id="reg-pw" placeholder="••••••••">
+                        </div>
+                        <span class="field-error" id="ri-pe">Password must be at least 6 characters</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Confirm Password</label>
+                        <div class="field-wrap">
+                            <input type="password" id="reg-confirm-pw" placeholder="••••••••">
+                        </div>
+                        <span class="field-error" id="ri-pce">Passwords do not match</span>
+                    </div>
+                    <button type="submit" class="submit-btn">Create account</button>
+                </form>
+                <div class="divider"></div>
+                <p class="form-footer">Already have an account? <span class="switch-link" onclick="showPanel('login')">Sign in</span></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showPanel(panel) {
+            document.getElementById('panel-login').classList.toggle('active', panel === 'login');
+            document.getElementById('panel-register').classList.toggle('active', panel === 'register');
+            document.getElementById('tab-login-btn').classList.toggle('active', panel === 'login');
+            document.getElementById('tab-register-btn').classList.toggle('active', panel === 'register');
+        }
+
+        function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+
+        function showFlash(id, msg, type='ok') {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.className = 'flash-msg ' + type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        }
+
+        function showErr(id,show){document.getElementById(id).style.display=show?'block':'none';}
+
+        // LOGIN form
+        document.getElementById('form-login').addEventListener('submit', async e => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-pw').value;
+            const btn = e.target.querySelector('.submit-btn');
+
+            if(!isValidEmail(email)) { showErr('li-ee', true); return; } else showErr('li-ee', false);
+            if(password.length < 6) { showErr('li-pe', true); return; } else showErr('li-pe', false);
+
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    showFlash('flash-msg-login', data.error || 'Login failed', 'err');
+                }
+            } catch (err) {
+                showFlash('flash-msg-login', 'Network error. Try again.', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign in';
+            }
+        });
+
+        // REGISTER form
+        document.getElementById('form-register').addEventListener('submit', async e => {
+            e.preventDefault();
+            const full_name = document.getElementById('reg-user').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-pw').value;
+            const confirm = document.getElementById('reg-confirm-pw').value;
+            const btn = e.target.querySelector('.submit-btn');
+
+            if(!full_name) { showErr('ri-ue', true); return; } else showErr('ri-ue', false);
+            if(!isValidEmail(email)) { showErr('ri-ee', true); return; } else showErr('ri-ee', false);
+            if(password.length < 6) { showErr('ri-pe', true); return; } else showErr('ri-pe', false);
+            if(password !== confirm) { showErr('ri-pce', true); return; } else showErr('ri-pce', false);
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        full_name, 
+                        email, 
+                        password, 
+                        confirm_password: confirm 
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showFlash('flash-msg-register', data.message, 'ok');
+                    setTimeout(() => showPanel('login'), 1500);
+                } else {
+                    showFlash('flash-msg-register', data.error || 'Registration failed', 'err');
+                }
+            } catch (err) {
+                showFlash('flash-msg-register', 'Network error. Try again.', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create account';
+            }
+        });
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('tab') === 'register') showPanel('register');
+        };
+    </script>
+</body>
+</html>

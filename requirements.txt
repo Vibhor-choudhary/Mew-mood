@@ -1,0 +1,9 @@
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+librosa
+joblib
+llvmlite
+Flask-Login

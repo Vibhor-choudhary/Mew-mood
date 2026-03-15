@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeowMood | AI Cat Emotion Recognition</title>
+    <style>
+        :root {
+            --bg-primary: #1A1614;
+            --bg-secondary: #0F0D0B;
+            --text-primary: #FFF8EB;
+            --text-muted: rgba(255, 248, 235, 0.5);
+            --accent-warm: #E8976A;
+            --accent-amber: #F4C842;
+            --border-subtle: rgba(255, 248, 235, 0.08);
+            --radius-card: 20px;
+            --radius-pill: 100px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        #loader-text {
+            font-family: Georgia, serif;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        #loader-bar-container {
+            width: 200px;
+            height: 2px;
+            background: rgba(255, 248, 235, 0.1);
+            position: relative;
+        }
+
+        #loader-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-warm);
+            transition: width 0.1s linear;
+        }
+
+        /* Canvas */
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-primary);
+            z-index: -2;
+        }
+
+        /* Hero Section wrapper */
+        #hero-scroll-container {
+            height: calc(151 * 12px);
+            width: 100%;
+            position: relative;
+        }
+
+        /* Fixed Text Overlays on Hero */
+        .hero-layer {
+            position: fixed;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.1s linear;
+        }
+
+        #layer-1 {
+            bottom: 25vh;
+            width: 100%;
+            text-align: center;
+        }
+
+        #layer-1 h1 {
+            font-family: Georgia, serif;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 300;
+            color: rgba(255, 248, 235, 0.92);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        #layer-1 p {
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
+            color: rgba(255, 220, 170, 0.7);
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        #layer-2 {
+            top: 50%;
+            transform: translateY(-50%);
+            left: clamp(4rem, 8vw, 10rem);
+        }
+
+        #layer-2 h2,
+        #layer-3 h2 {
+            font-family: Georgia, serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 300;
+            color: rgba(255, 248, 235, 0.90);
+            line-height: 1.2;
+        }
+
+        #layer-3 {
+            top: 50%;
+            transform: translateY(-50%);
+            right: clamp(4rem, 8vw, 10rem);
+            text-align: right;
+        }
+
+        #layer-4 {
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            text-align: center;
+        }
+
+        #layer-4 h2 {
+            font-family: Georgia, serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 300;
+            color: rgba(255, 248, 235, 0.95);
+            line-height: 1.2;
+        }
+
+        /* Scroll Indicator */
+        #scroll-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid rgba(255, 220, 170, 0.6);
+            border-bottom: 2px solid rgba(255, 220, 170, 0.6);
+            transform: rotate(45deg);
+            margin: 0 auto 0.5rem auto;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0) rotate(45deg);
+            }
+
+            40% {
+                transform: translateY(-10px) rotate(45deg);
+            }
+
+            60% {
+                transform: translateY(-5px) rotate(45deg);
+            }
+        }
+
+        #scroll-indicator p {
+            color: rgba(255, 220, 170, 0.6);
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        /* Transition Overlay */
+        #transition-overlay {
+            position: fixed;
+            inset: 0;
+            background: #1A1614;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Main Content Sections */
+        #main-content {
+            position: relative;
+            z-index: 30;
+            background: var(--bg-primary);
+            /* Section 2 hero landing slides up */
+            transform: translateY(100px);
+            transition: transform 0.8s ease;
+            /* Ensures content hides behind hero while scrolling */
+        }
+
+        #main-content.visible {
+            transform: translateY(0);
+        }
+
+        /* SECTION 2: HERO LANDING */
+        .hero-landing {
+            min-height: 100vh;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-landing h2 {
+            font-family: Georgia, serif;
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 300;
+            color: #FFF8EB;
+            line-height: 1.1;
+        }
+
+        .hero-landing .subhead {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: rgba(255, 248, 235, 0.55);
+            line-height: 1.7;
+            margin-top: 1.5rem;
+            max-width: 600px;
+        }
+
+        .cta-btn {
+            background: var(--accent-warm);
+            color: #1A1614;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 1rem 2.5rem;
+            border-radius: var(--radius-pill);
+            border: none;
+            margin-top: 2.5rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-btn:hover {
+            background: #F0A87C;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(232, 151, 106, 0.35);
+        }
+
+        .hero-landing .small-text {
+            font-size: 0.75rem;
+            color: rgba(255, 248, 235, 0.3);
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+        }
+
+        /* SECTION 3: EMOTION SPECTRUM */
+        .emotions-section {
+            background: #0C0A09;
+            padding: 8rem clamp(2rem, 8vw, 10rem);
+            position: relative;
+            overflow: hidden;
+            --active-color: #e05a5a;
+        }
+
+        .emotion-glow {
+            position: absolute;
+            bottom: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, var(--active-color) 0%, transparent 65%);
+            opacity: 0.05;
+            pointer-events: none;
+            transition: background 0.4s ease;
+            z-index: 0;
+        }
+
+        .spectrum-container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            color: var(--accent-warm);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .spectrum-container h2 {
+            font-family: Georgia, serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 300;
+            color: #FFF8EB;
+            line-height: 1.15;
+            margin-bottom: 4rem;
+        }
+
+        .emotion-card {
+            background: rgba(255, 248, 235, 0.025);
+            border: 1px solid rgba(224, 90, 90, 0.16); 
+            border-radius: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            transition: border-color 0.4s ease;
+            margin-bottom: 4rem;
+            min-height: 360px;
+        }
+
+        .emotion-col-left {
+            flex: 1 1 300px;
+            padding: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .emotion-text-content {
+            transition: opacity 180ms ease;
+        }
+
+        .emotion-micro {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255, 248, 235, 0.2);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .emotion-name {
+            font-family: Georgia, serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: #FFF8EB;
+            margin-bottom: 1.25rem;
+        }
+
+        .emotion-desc {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255, 248, 235, 0.4);
+            margin-bottom: 2.5rem;
+            max-width: 400px;
+        }
+
+        .confidence-label {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.85rem;
+            color: rgba(255, 248, 235, 0.4);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .confidence-val {
+            color: #FFF8EB;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .confidence-track {
+            height: 4px;
+            background: rgba(255, 248, 235, 0.07);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--active-color);
+            transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.4s ease;
+        }
+
+        .emotion-col-right {
+            flex: 1 1 300px;
+            background: #080706;
+            border-radius: 0 14px 14px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .emotion-col-right {
+                border-radius: 0 0 14px 14px;
+                order: -1;
+            }
+            .emotion-col-left {
+                padding: 2rem;
+            }
+        }
+
+        .thumbnail-wrap {
+            width: 100%;
+            max-width: 250px;
+            perspective: 1000px;
+        }
+
+        .thumbnail-frame {
+            border-radius: 10px;
+            overflow: hidden;
+            transform: rotate(-4deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transition: transform 0.35s ease;
+            background: #0C0A09;
+        }
+
+        .thumbnail-frame:hover {
+            transform: rotate(-4deg) scale(1.15);
+        }
+
+        .thumbnail-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Slider Component */
+        .slider-container {
+            padding: 1rem 0 2rem 0;
+            user-select: none;
+        }
+
+        .slider-track-wrap {
+            position: relative;
+            cursor: pointer;
+            height: 44px;
+            background: rgba(255, 248, 235, 0.04);
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 248, 235, 0.04);
+        }
+
+        .slider-progress-wrapper {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .slider-fill-bg {
+            width: 100%;
+            height: 100%;
+            background: var(--active-color);
+            opacity: 0.2;
+            transition: background 0.4s ease;
+        }
+
+        .slider-fill-edge {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--active-color);
+            box-shadow: 0 0 15px var(--active-color);
+            transition: background 0.4s ease;
+        }
+
+        .slider-labels {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .slider-label {
+            flex: 1;
+            text-align: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.85rem;
+            color: rgba(255, 248, 235, 0.4);
+            transition: color 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slider-label.active {
+            color: #FFF8EB;
+            font-weight: 500;
+            transform: scale(1.05);
+        }
+
+        /* SECTION 4: SEE IT IN ACTION */
+        #see-it-in-action {
+            background: #0C0A09;
+            padding: 6rem clamp(2rem, 8vw, 8rem);
+        }
+
+        #see-it-in-action .section-label {
+            font-size: 9px;
+            letter-spacing: 0.45em;
+            color: rgba(255, 248, 235, 0.2);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        #see-it-in-action h2 {
+            font-family: Georgia, serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 400;
+            color: #FFF8EB;
+            margin-bottom: 3.5rem;
+        }
+
+        .action-grid-new {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-top: 2.5rem;
+        }
+
+        @media (max-width: 639px) {
+            .action-grid-new {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Mascot Column */
+        .mascot-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .mascot-img {
+            width: 160px;
+            display: block;
+            animation: mascotFloat 3.5s ease-in-out infinite;
+        }
+
+        @keyframes mascotFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ambient-glow {
+            width: 80%;
+            height: 14px;
+            margin-top: -6px;
+            background: radial-gradient(ellipse, rgba(232, 151, 106, 0.22), transparent);
+            filter: blur(8px);
+        }
+
+        .mascot-bubble {
+            width: 100%;
+            background: rgba(255, 248, 235, 0.04);
+            border: 1px solid rgba(255, 248, 235, 0.11);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            position: relative;
+        }
+
+        .mascot-bubble::before {
+            content: '';
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 9px solid rgba(255, 248, 235, 0.11);
+        }
+
+        .mascot-bubble::after {
+            content: '';
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 8px solid #141210;
+        }
+
+        .bubble-line1 {
+            font-family: Georgia, serif;
+            font-size: 0.88rem;
+            color: #FFF8EB;
+            display: block;
+            text-align: center;
+            margin-bottom: 0.15rem;
+        }
+
+        .bubble-line2 {
+            font-family: Georgia, serif;
+            font-size: 0.88rem;
+            color: rgba(255, 248, 235, 0.55);
+            display: block;
+            text-align: center;
+            margin-bottom: 0.55rem;
+        }
+
+        .bubble-author {
+            font-family: monospace;
+            font-size: 0.65rem;
+            color: rgba(255, 248, 235, 0.2);
+            letter-spacing: 0.07em;
+            text-align: center;
+            display: block;
+        }
+
+        /* Workflow Column */
+        .workflow-col {
+            width: 100%;
+        }
+
+        .progress-track-wrapper {
+            position: relative;
+            padding: 0 18px;
+            margin-bottom: 1.75rem;
+        }
+
+        .progress-track-bg {
+            height: 2px;
+            background: rgba(255, 248, 235, 0.07);
+            border-radius: 100px;
+            position: relative;
+        }
+
+        .progress-track-fill {
+            height: 100%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, #E8976A, #6b9fd4, #c084fc, #d4a017);
+            width: 0%;
+            transition: width 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-dots {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0C0A09;
+            border: 1.5px solid rgba(255, 248, 235, 0.12);
+            flex-shrink: 0;
+            transition: border-color 0.4s, box-shadow 0.4s;
+        }
+
+        .progress-dot.lit {
+            border-color: var(--dot-color);
+            box-shadow: 0 0 8px var(--dot-color);
+        }
+
+        .step-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 639px) {
+            .step-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .mascot-img {
+                width: 130px;
+            }
+        }
+
+        .wf-step {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .wf-step.shown {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-card {
+            background: rgba(255, 248, 235, 0.025);
+            border: 1px solid rgba(255, 248, 235, 0.06);
+            border-radius: 12px;
+            padding: 1.1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.6rem;
+        }
+
+        .step-emoji {
+            font-size: 44px;
+            line-height: 1;
+            display: block;
+            margin-bottom: 0.1rem;
+        }
+
+        .step-title {
+            font-family: Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: #FFF8EB;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .step-desc {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.82rem;
+            color: rgba(255, 248, 235, 0.45);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .step-tech {
+            font-family: monospace;
+            font-size: 0.62rem;
+            color: var(--step-color);
+            opacity: 0.45;
+            margin-top: auto;
+            padding-top: 0.5rem;
+            letter-spacing: 0.04em;
+        }
+
+        .replay-btn {
+            font-size: 10px;
+            font-family: monospace;
+            color: rgba(255, 248, 235, 0.3);
+            background: none;
+            border: 1px solid rgba(255, 248, 235, 0.08);
+            border-radius: 100px;
+            padding: 4px 14px;
+            cursor: pointer;
+            display: block;
+            margin: 1.25rem auto 0;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .replay-btn:hover {
+            color: rgba(255, 248, 235, 0.7);
+            border-color: rgba(255, 248, 235, 0.2);
+        }
+
+        /* Final CTA */
+        #final-cta {
+            background: #0C0A09;
+            padding: 8rem clamp(2rem, 8vw, 8rem);
+            text-align: center;
+            border-top: 1px solid rgba(255, 248, 235, 0.05);
+        }
+
+        .cta-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-heading {
+            font-family: Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #FFF8EB;
+            margin-bottom: 2.5rem;
+            line-height: 1.2;
+        }
+
+        .cta-btn-big {
+            display: inline-block;
+            font-family: system-ui, sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1A1614;
+            background: #E8976A;
+            padding: 1.2rem 3rem;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 4px 20px rgba(232, 151, 106, 0.2);
+        }
+
+        .cta-btn-big:hover {
+            background: #F0A87C;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(232, 151, 106, 0.4);
+        }
+
+        .cta-btn-big:active {
+            transform: translateY(-1px);
+        }
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 3rem clamp(2rem, 8vw, 10rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-left {
+            font-family: Georgia, serif;
+            font-size: 1.2rem;
+            color: rgba(255, 248, 235, 0.4);
+        }
+
+        .footer-right {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 248, 235, 0.2);
+            letter-spacing: 0.05em;
+        }
+
+        /* Navbar */
+        #navbar {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            z-index: 1000;
+            width: fit-content;
+            min-width: min(720px, 90vw);
+            background: rgba(26, 22, 20, 0.45);
+            backdrop-filter: blur(12px) saturate(1.4);
+            -webkit-backdrop-filter: blur(12px) saturate(1.4);
+            border: 1px solid rgba(255, 248, 235, 0.10);
+            border-radius: 100px;
+            padding: 0.6rem 0.75rem;
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 248, 235, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-20px) translateX(-50%);
+            transition: opacity 0.6s ease, transform 0.6s ease, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+        }
+
+        #navbar.visible {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) translateX(-50%);
+        }
+
+        #navbar.scrolled {
+            background: rgba(26, 22, 20, 0.72);
+            backdrop-filter: blur(20px) saturate(1.8);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8);
+            border-color: rgba(255, 248, 235, 0.13);
+            box-shadow:
+                0 8px 40px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 248, 235, 0.08);
+        }
+
+        .nav-logo {
+            font-family: Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: rgba(255, 248, 235, 0.92);
+            letter-spacing: 0.04em;
+            padding: 0.45rem 1.1rem;
+            border-radius: 100px;
+            background: rgba(255, 248, 235, 0.06);
+            border: 1px solid rgba(255, 248, 235, 0.08);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-logo:hover {
+            background: rgba(255, 248, 235, 0.10);
+            border-color: rgba(255, 248, 235, 0.15);
+        }
+
+        .nav-paw {
+            margin-right: 0.4em;
+            font-size: 0.85rem;
+        }
+
+        .nav-spacer {
+            margin-left: auto;
+        }
+
+        .nav-link {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 450;
+            color: rgba(255, 248, 235, 0.55);
+            text-decoration: none;
+            padding: 0.45rem 0.9rem;
+            border-radius: 100px;
+            letter-spacing: 0.01em;
+            transition: color 0.2s ease, background 0.2s ease;
+            background: transparent;
+            border: none;
+        }
+
+        .nav-link:hover {
+            color: rgba(255, 248, 235, 0.92);
+            background: rgba(255, 248, 235, 0.06);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 16px;
+            background: rgba(255, 248, 235, 0.12);
+            margin: 0 0.35rem;
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .nav-cta {
+            font-family: system-ui, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1A1614;
+            background: #E8976A;
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: #F0A87C;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(232, 151, 106, 0.40);
+        }
+
+        .nav-cta:active {
+            transform: translateY(0px);
+        }
+
+        @media (max-width: 639px) {
+            #navbar {
+                min-width: calc(100vw - 2.5rem);
+            }
+            .nav-hide-mobile {
+                display: none !important;
+            }
+            .nav-divider-mobile-hide {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <div id="navbar">
+        <a href="#" class="nav-logo"><span class="nav-paw">🐾</span>MeowMood</a>
+        <div class="nav-spacer"></div>
+        <a href="#see-it-in-action" class="nav-link nav-hide-mobile">How It Works</a>
+        <div class="nav-divider nav-divider-mobile-hide"></div>
+        <a href="./login.html" class="nav-link">Login</a>
+        <a href="./login.html?tab=register" class="nav-cta">Get started</a>
+    </div>
+
+    <!-- Preloader -->
+    <div id="loader">
+        <div id="loader-text">Loading MeowMood...</div>
+        <div id="loader-bar-container">
+            <div id="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- Hero Scroll Area -->
+    <canvas id="hero-canvas"></canvas>
+    <div id="hero-scroll-container">
+
+        <!-- Overlays -->
+        <div id="layer-1" class="hero-layer">
+            <h1>MeowMood</h1>
+            <p>AI Cat Emotion Recognition</p>
+        </div>
+
+        <div id="layer-2" class="hero-layer">
+            <h2>Every blink<br>tells a story.</h2>
+        </div>
+
+        <div id="layer-3" class="hero-layer">
+            <h2>We taught AI<br>to listen.</h2>
+        </div>
+
+        <div id="layer-4" class="hero-layer">
+            <h2>Meet your cat's<br>inner world.</h2>
+        </div>
+
+        <div id="scroll-indicator">
+            <div class="chevron"></div>
+            <p>scroll</p>
+        </div>
+
+    </div>
+
+    <div id="transition-overlay"></div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+
+        <!-- Section 2: Hero Landing -->
+        <section class="hero-landing">
+            <h2>Understand what<br>your cat feels.</h2>
+            <p class="subhead">Upload a photo or audio of your cat.<br>MeowMood's AI reads their emotion instantly.</p>
+            <a href="#" class="cta-btn">Analyze Your Cat &rarr;</a>
+            <p class="small-text">Supports cat images and audio files</p>
+        </section>
+
+        <!-- Section 3: Emotion Spectrum Component -->
+        <section class="emotions-section" id="emotions-section">
+            <div class="emotion-glow"></div>
+            
+            <div class="spectrum-container">
+                <div class="spectrum-header">
+                    <span class="section-label">What We Detect</span>
+                    <h2>The Emotion Spectrum</h2>
+                </div>
+                
+                <div class="emotion-card" id="emotion-card">
+                    <div class="emotion-col-left">
+                        <div class="emotion-text-content" id="emotion-text-content">
+                            <span class="emotion-micro">ANALYSIS RESULT</span>
+                            <h3 class="emotion-name" id="emotion-name">Angry</h3>
+                            <p class="emotion-desc" id="emotion-desc">Dilated pupils, flattened ears, sharp short vocalisations. The cat feels threatened or is in active defence mode.</p>
+                            
+                            <div class="confidence-container">
+                                <div class="confidence-label">
+                                    <span>Confidence</span>
+                                    <span class="confidence-val" id="confidence-val">84%</span>
+                                </div>
+                                <div class="confidence-track">
+                                    <div class="confidence-fill" id="confidence-fill" style="width: 84%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="emotion-col-right">
+                        <div class="thumbnail-wrap">
+                            <div class="thumbnail-frame">
+                                <img id="emotion-img" src="./emotions/angry.png" alt="Angry Cat Image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-track-wrap" id="slider-track-wrap">
+                        <div class="slider-progress-wrapper" id="slider-fill" style="width: 0%;">
+                            <div class="slider-fill-bg"></div>
+                            <div class="slider-fill-edge"></div>
+                        </div>
+                        <div class="slider-labels">
+                            <div class="slider-label active" data-idx="0">Angry</div>
+                            <div class="slider-label" data-idx="1">Happy</div>
+                            <div class="slider-label" data-idx="2">Sad</div>
+                            <div class="slider-label" data-idx="3">Scared</div>
+                            <div class="slider-label" data-idx="4">Surprised</div>
+                            <div class="slider-label" data-idx="5">Other</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: See It In Action -->
+        <section id="see-it-in-action">
+            <span class="section-label">SEE IT IN ACTION</span>
+            <h2>Watch our AI understand your cat.</h2>
+            
+            <div class="action-grid-new">
+                
+                <!-- Mascot Column -->
+                <div class="mascot-col">
+                    <img src="./mascot.png" alt="MeowMood mascot" class="mascot-img">
+                    <div class="ambient-glow"></div>
+                    <div class="mascot-bubble">
+                        <span class="bubble-line1">"I analyse every whisker."</span>
+                        <span class="bubble-line2">"Every meow. Every blink."</span>
+                        <span class="bubble-author">&mdash; MeowMood AI</span>
+                    </div>
+                </div>
+
+                <!-- Workflow Column -->
+                <div class="workflow-col">
+                    
+                    <div class="progress-track-wrapper">
+                        <div class="progress-track-bg">
+                            <div class="progress-track-fill" id="wf-fill"></div>
+                        </div>
+                        <div class="progress-dots">
+                            <div class="progress-dot wf-dot" style="--dot-color: #E8976A"></div>
+                            <div class="progress-dot wf-dot" style="--dot-color: #6b9fd4"></div>
+                            <div class="progress-dot wf-dot" style="--dot-color: #c084fc"></div>
+                            <div class="progress-dot wf-dot" style="--dot-color: #d4a017"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-cards-grid">
+                        
+                        <div class="wf-step">
+                            <div class="step-card" style="--step-color: #E8976A">
+                                <span class="step-emoji">📸</span>
+                                <h4 class="step-title">Drop your file</h4>
+                                <p class="step-desc">Upload a photo of your cat's face or a short audio clip of their meow.</p>
+                                <span class="step-tech">Flask</span>
+                            </div>
+                        </div>
+
+                        <div class="wf-step">
+                            <div class="step-card" style="--step-color: #6b9fd4">
+                                <span class="step-emoji">🔍</span>
+                                <h4 class="step-title">AI reads the signals</h4>
+                                <p class="step-desc">The model scans facial features in images and frequency patterns in audio.</p>
+                                <span class="step-tech">PyTorch · Librosa</span>
+                            </div>
+                        </div>
+
+                        <div class="wf-step">
+                            <div class="step-card" style="--step-color: #c084fc">
+                                <span class="step-emoji">🧠</span>
+                                <h4 class="step-title">Patterns are matched</h4>
+                                <p class="step-desc">Signals are compared against thousands of labelled cat behaviours.</p>
+                                <span class="step-tech">ResNet18</span>
+                            </div>
+                        </div>
+
+                        <div class="wf-step">
+                            <div class="step-card" style="--step-color: #d4a017">
+                                <span class="step-emoji">✨</span>
+                                <h4 class="step-title">Emotion revealed</h4>
+                                <p class="step-desc">You get a clear emotion label and a confidence score. Instantly.</p>
+                                <span class="step-tech">MeowMood</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <button class="replay-btn" id="wf-replay">&#8634; Replay</button>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Final CTA -->
+        <section id="final-cta" style="position: relative; overflow: hidden;">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: 0;
+                opacity: 0.45;
+              "
+            >
+              <source src="./video/KYC.mp4" type="video/mp4">
+            </video>
+            <div style="
+              position: absolute;
+              inset: 0;
+              background: rgba(12, 10, 9, 0.55);
+              z-index: 0;
+            "></div>
+            <div class="cta-content" style="position: relative; z-index: 1;">
+                <h2 class="cta-heading">Know what your cat feels now.</h2>
+                <a href="/login?tab=register" class="cta-btn-big">Start now</a>
+            </div>
+        </section>
+
+        <!-- Section 6: Footer -->
+        <footer>
+            <div class="footer-left">MeowMood</div>
+            <div class="footer-right">Built with PyTorch &middot; Flask &middot; Librosa</div>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const TOTAL_FRAMES = 151;
+            const images = [];
+            let loadedCount = 0;
+
+            const loader = document.getElementById('loader');
+            const loaderBar = document.getElementById('loader-bar');
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            const heroContainer = document.getElementById('hero-scroll-container');
+            const transitionOverlay = document.getElementById('transition-overlay');
+            const mainContent = document.getElementById('main-content');
+            const scrollIndicator = document.getElementById('scroll-indicator');
+
+            const layer1 = document.getElementById('layer-1');
+            const layer2 = document.getElementById('layer-2');
+            const layer3 = document.getElementById('layer-3');
+            const layer4 = document.getElementById('layer-4');
+            const navbar = document.getElementById('navbar');
+
+            // Helper function to load image
+            const loadImage = (index) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const num = index.toString().padStart(3, '0');
+                    img.src = `./frames/cat_${num}.jpg`;
+
+                    img.onload = () => {
+                        loadedCount++;
+                        loaderBar.style.width = `${(loadedCount / TOTAL_FRAMES) * 100}%`;
+                        resolve(img);
+                    };
+
+                    img.onerror = () => {
+                        console.error(`Failed to load frame ${index}`);
+                        loadedCount++;
+                        resolve(img);
+                    };
+                });
+            };
+
+            // Preload all frames
+            const loadAllFrames = async () => {
+                const promises = [];
+                for (let i = 1; i <= TOTAL_FRAMES; i++) {
+                    promises.push(loadImage(i));
+                }
+
+                const loadedImages = await Promise.all(promises);
+                images.push(...loadedImages);
+
+                // Hide loader once all loaded
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        initEngine();
+                    }, 800);
+                }, 500);
+            };
+
+            // Set canvas size
+            const resizeCanvas = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                if (images.length > 0) {
+                    drawFrame(getCurrentFrameIndex());
+                }
+            };
+
+            // Draw specific frame
+            const drawFrame = (index) => {
+                const img = images[index];
+                if (!img || !img.naturalWidth) return;
+
+                const scale = Math.max(
+                    canvas.width / img.naturalWidth,
+                    canvas.height / img.naturalHeight
+                );
+                const x = (canvas.width - img.naturalWidth * scale) / 2;
+                const y = (canvas.height - img.naturalHeight * scale) / 2;
+
+                ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale);
+            };
+
+            const getCurrentFrameIndex = () => {
+                const scrollFraction = getScrollFraction();
+                return Math.min(
+                    Math.floor(scrollFraction * TOTAL_FRAMES),
+                    TOTAL_FRAMES - 1
+                );
+            };
+
+            const getScrollFraction = () => {
+                const scrollDistance = heroContainer.offsetHeight - window.innerHeight;
+                if (scrollDistance <= 0) return 0;
+                let fraction = window.scrollY / scrollDistance;
+                if (fraction < 0) fraction = 0;
+                if (fraction > 1) fraction = 1;
+                return fraction;
+            };
+
+            const mapRangeValid = (value, inMin, inMax, outMin, outMax) => {
+                if (value <= inMin) return outMin;
+                if (value >= inMax) return outMax;
+                return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+            };
+
+            const updateOverlays = (fraction) => {
+                // Scroll Indicator: 0.00 to 0.08
+                if (fraction <= 0.08) {
+                    scrollIndicator.style.opacity = mapRangeValid(fraction, 0.00, 0.08, 1, 0);
+                } else {
+                    scrollIndicator.style.opacity = 0;
+                }
+
+                // Layer 1: 0.00 to 0.15 (fade out by 0.20)
+                if (fraction <= 0.15) {
+                    layer1.style.opacity = 1;
+                } else if (fraction <= 0.20) {
+                    layer1.style.opacity = mapRangeValid(fraction, 0.15, 0.20, 1, 0);
+                } else {
+                    layer1.style.opacity = 0;
+                }
+
+                // Layer 2: 0.25 to 0.45 
+                if (fraction > 0.20 && fraction < 0.50) {
+                    if (fraction < 0.30) {
+                        layer2.style.opacity = mapRangeValid(fraction, 0.25, 0.30, 0, 1);
+                    } else if (fraction > 0.40) {
+                        layer2.style.opacity = mapRangeValid(fraction, 0.40, 0.45, 1, 0);
+                    } else {
+                        layer2.style.opacity = 1;
+                    }
+                } else {
+                    layer2.style.opacity = 0;
+                }
+
+                // Layer 3: 0.55 to 0.75
+                if (fraction > 0.50 && fraction < 0.80) {
+                    if (fraction < 0.60) {
+                        layer3.style.opacity = mapRangeValid(fraction, 0.55, 0.60, 0, 1);
+                    } else if (fraction > 0.70) {
+                        layer3.style.opacity = mapRangeValid(fraction, 0.70, 0.75, 1, 0);
+                    } else {
+                        layer3.style.opacity = 1;
+                    }
+                } else {
+                    layer3.style.opacity = 0;
+                }
+
+                // Layer 4: 0.82 to 1.00+
+                if (fraction >= 0.82) {
+                    layer4.style.opacity = mapRangeValid(fraction, 0.82, 0.87, 0, 1);
+                } else {
+                    layer4.style.opacity = 0;
+                }
+
+                // Transition logic & content slide up
+                if (fraction >= 1.0) {
+                    canvas.style.position = 'absolute';
+                    canvas.style.top = (heroContainer.offsetHeight - window.innerHeight) + 'px';
+
+                    transitionOverlay.style.opacity = '1';
+                    mainContent.classList.add('visible');
+                } else {
+                    canvas.style.position = 'fixed';
+                    canvas.style.top = '0px';
+
+                    transitionOverlay.style.opacity = '0';
+                    mainContent.classList.remove('visible');
+                }
+            };
+
+            const initEngine = () => {
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                let ticking = false;
+
+                const scrollHandler = () => {
+                    if (!ticking) {
+                        requestAnimationFrame(() => {
+                            const fraction = getScrollFraction();
+                            const frameIndex = Math.min(
+                                Math.floor(fraction * TOTAL_FRAMES),
+                                TOTAL_FRAMES - 1
+                            );
+                            drawFrame(frameIndex);
+                            updateOverlays(fraction);
+                            
+                            // Navbar logic
+                            const heroEndScroll = heroContainer.offsetHeight - window.innerHeight;
+                            if (fraction >= 1.0 || window.scrollY >= heroContainer.offsetHeight) {
+                                navbar.classList.add('visible');
+                            }
+                            if (window.scrollY > heroEndScroll + 80) {
+                                navbar.classList.add('scrolled');
+                            } else {
+                                navbar.classList.remove('scrolled');
+                            }
+
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                };
+
+                window.addEventListener('scroll', scrollHandler);
+                // Initial state
+                scrollHandler();
+            };
+
+            // Emotion Slider Logic
+            const emotionsData = [
+                { name: "Angry", conf: 84, color: "#e05a5a", img: "./emotions/angry.png", desc: "Dilated pupils, flattened ears, sharp short vocalisations. The cat feels threatened or is in active defence mode." },
+                { name: "Happy", conf: 91, color: "#d4a017", img: "./emotions/happy.png", desc: "Slow blinks, relaxed posture, soft purring. The cat is content and feels completely safe in its environment." },
+                { name: "Sad", conf: 78, color: "#6b9fd4", img: "./emotions/sad.png", desc: "Withdrawn behaviour, drooped ears, low-pitched drawn-out meows. The cat may need comfort or attention." },
+                { name: "Scared", conf: 73, color: "#c084fc", img: "./emotions/scared.png", desc: "Maximum pupil dilation, ears pinned back, crouched or frozen posture. The cat perceives a nearby threat." },
+                { name: "Surprised", conf: 69, color: "#34d399", img: "./emotions/surprised.png", desc: "Sudden head lift, briefly wide eyes, abrupt halt in movement. A startle response to an unexpected stimulus." },
+                { name: "Other", conf: 62, color: "#9b8fd4", img: "./emotions/other.png", desc: "Ambiguous or mixed signals with no dominant class above threshold. Not all emotional states fit a single label." }
+            ];
+
+            let currentEmotionIdx = 0;
+            let isUpdating = false;
+            let currentProgress = 0; // 0 to 1
+            let isAutoplay = true;
+            let isDragging = false;
+            let lastTime = null;
+            const totalDuration = 6 * 4000; // 24 seconds total loop
+
+            const hexToRgba = (hex, alpha) => {
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            };
+
+            const rootSection = document.getElementById('emotions-section');
+            const cardEl = document.getElementById('emotion-card');
+            const textContent = document.getElementById('emotion-text-content');
+            const fillEl = document.getElementById('slider-fill');
+            const nameEl = document.getElementById('emotion-name');
+            const descEl = document.getElementById('emotion-desc');
+            const confValEl = document.getElementById('confidence-val');
+            const confFillEl = document.getElementById('confidence-fill');
+            const imgEl = document.getElementById('emotion-img');
+            const labelsMap = document.querySelectorAll('.slider-label');
+
+            const setEmotion = (idx) => {
+                if (idx === currentEmotionIdx || isUpdating) return;
+                isUpdating = true;
+                currentEmotionIdx = idx;
+                const data = emotionsData[idx];
+
+                rootSection.style.setProperty('--active-color', data.color);
+                cardEl.style.borderColor = hexToRgba(data.color, 0.16);
+
+                labelsMap.forEach((lbl, i) => {
+                    lbl.classList.toggle('active', i === idx);
+                });
+
+                textContent.style.opacity = '0';
+
+                setTimeout(() => {
+                    nameEl.innerText = data.name;
+                    descEl.innerText = data.desc;
+                    confValEl.innerText = data.conf + '%';
+                    confFillEl.style.width = data.conf + '%';
+                    imgEl.src = data.img;
+
+                    textContent.style.opacity = '1';
+                    isUpdating = false;
+                }, 180);
+            };
+
+            const animateSlider = (time) => {
+                if (!lastTime) lastTime = time;
+                const dt = time - lastTime;
+                lastTime = time;
+
+                if (isAutoplay && !isDragging) {
+                    currentProgress += dt / totalDuration;
+                    if (currentProgress >= 1) currentProgress = 0;
+                    
+                    let idx = Math.floor(currentProgress * 6);
+                    if (idx >= 6) idx = 5;
+                    
+                    setEmotion(idx);
+                }
+                
+                // Manually update the visual width each frame based on current progress natively
+                fillEl.style.width = (currentProgress * 100) + '%';
+                
+                requestAnimationFrame(animateSlider);
+            };
+
+            const trackWrap = document.getElementById('slider-track-wrap');
+            
+            const handleInteract = (e) => {
+                const rect = trackWrap.getBoundingClientRect();
+                let x = e.clientX || (e.touches && e.touches[0].clientX);
+                if (x === undefined) return;
+                
+                let percent = (x - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                currentProgress = percent;
+                fillEl.style.width = (currentProgress * 100) + '%';
+                
+                let idx = Math.floor(percent * 6);
+                if (idx > 5) idx = 5;
+                setEmotion(idx);
+            };
+
+            trackWrap.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                handleInteract(e);
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) handleInteract(e);
+            });
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            trackWrap.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                handleInteract(e);
+            }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging) handleInteract(e);
+            }, { passive: true });
+            window.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            labelsMap.forEach((lbl, i) => {
+                lbl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentProgress = (i / 6) + (1 / 12);
+                    fillEl.style.width = (currentProgress * 100) + '%';
+                    setEmotion(i);
+                });
+            });
+
+            cardEl.addEventListener('mouseenter', () => isAutoplay = false);
+            cardEl.addEventListener('mouseleave', () => {
+                lastTime = null; // prevents jumping by resetting delta
+                isAutoplay = true;
+            });
+            cardEl.addEventListener('touchstart', () => isAutoplay = false, { passive: true });
+
+            requestAnimationFrame(animateSlider);
+
+            // Action section Observer
+            const actionSection = document.getElementById('see-it-in-action');
+            if (actionSection) {
+                const wfFill = document.getElementById('wf-fill');
+                const wfDots = document.querySelectorAll('.wf-dot');
+                const wfSteps = document.querySelectorAll('.wf-step');
+                const replayBtn = document.getElementById('wf-replay');
+                let timerTimeouts = [];
+
+                const startSequence = () => {
+                    wfFill.style.transition = 'width 2.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    wfFill.style.width = '100%';
+
+                    const timings = [300, 900, 1500, 2200];
+                    timings.forEach((t, i) => {
+                        const timeout = setTimeout(() => {
+                            if (wfDots[i]) wfDots[i].classList.add('lit');
+                            if (wfSteps[i]) wfSteps[i].classList.add('shown');
+                        }, t);
+                        timerTimeouts.push(timeout);
+                    });
+                };
+
+                const resetSequence = () => {
+                    timerTimeouts.forEach(t => clearTimeout(t));
+                    timerTimeouts = [];
+                    
+                    wfFill.style.transition = 'none';
+                    wfFill.style.width = '0%';
+                    wfDots.forEach(d => d.classList.remove('lit'));
+                    wfSteps.forEach(s => s.classList.remove('shown'));
+                };
+
+                const actionObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startSequence();
+                            actionObserver.disconnect();
+                        }
+                    });
+                }, { threshold: 0.25 });
+
+                if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    wfFill.style.transition = 'none';
+                    wfFill.style.width = '100%';
+                    wfDots.forEach(d => d.classList.add('lit'));
+                    wfSteps.forEach(s => s.classList.add('shown'));
+                } else {
+                    actionObserver.observe(actionSection);
+                }
+
+                if (replayBtn) {
+                    replayBtn.addEventListener('click', () => {
+                        resetSequence();
+                        setTimeout(() => startSequence(), 100);
+                    });
+                }
+            }
+
+            // Start preloading
+            loadAllFrames();
+        });
+    </script>
+</body>
+
+</html>

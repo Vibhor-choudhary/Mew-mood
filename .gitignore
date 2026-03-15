@@ -1,0 +1,35 @@
+# ── Python cache ──
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Virtual environment (THIS is your 1.2GB) ──
+.venv/
+venv/
+env/
+
+# ── Environment variables ──
+.env
+
+# ── Database file ──
+database/cat_emotion.db
+
+# ── User uploaded files ──
+uploads/
+
+# ── ML model weights ──
+backend/trained_modelimages/
+
+# ── Training scripts ──
+backend/models_training/
+
+# ── All data analysis ──
+data_analysis/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.vscode/
+.idea/

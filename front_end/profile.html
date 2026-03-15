@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeowMood · Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1A1614;--bg2:#0F0D0B;--bg3:#221e1b;--text:#FFF8EB;--muted:rgba(255,248,235,0.45);--acc:#E8976A;--border:rgba(255,248,235,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}button{font-family:'DM Sans',system-ui,sans-serif;cursor:pointer}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,248,235,0.1);border-radius:2px}
+.app{display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
+.sb{width:72px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;flex-shrink:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1)}
+.sb.open{width:200px;align-items:stretch;padding:12px 8px}
+.sb-top{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid rgba(255,248,235,0.07);margin-bottom:8px;width:100%;justify-content:center}
+.sb.open .sb-top{justify-content:flex-start;padding:0 4px 12px}
+.sb-paw{width:32px;height:32px;flex-shrink:0;background:rgba(244,200,66,0.15);border:1px solid rgba(244,200,66,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:background .2s}
+.sb-paw:hover{background:rgba(244,200,66,0.28)}
+.sb-brand{font-family:'DM Serif Display',serif;font-size:14px;white-space:nowrap;opacity:0;max-width:0;overflow:hidden;transition:max-width .25s cubic-bezier(.4,0,.2,1), opacity .15s}
+.sb.open .sb-brand{opacity:1;max-width:160px}
+.sb-nav{display:flex;flex-direction:column;gap:2px;width:100%;flex:1}
+.sb-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;border-radius:10px;border:none;background:transparent;color:rgba(255,248,235,0.45);width:100%;cursor:pointer;transition:background .2s,color .2s}
+.sb.open .sb-item{flex-direction:row;justify-content:flex-start;padding:9px 10px;gap:10px}
+.sb-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,248,235,0.8)}
+.sb-item.active{background:rgba(232,151,106,0.14);color:var(--acc)}
+.sb-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.sb.open .sb-lbl{font-size:12px;text-transform:none;letter-spacing:0}
+.sb-bottom{margin-top:auto;width:100%}
+.sb-out{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;border-radius:10px;border:none;background:transparent;color:rgba(224,90,90,0.5);width:100%;cursor:pointer;transition:background .2s,color .2s}
+.sb.open .sb-out{flex-direction:row;justify-content:flex-start;padding:9px 10px;gap:10px}
+.sb-out:hover{background:rgba(224,90,90,0.08);color:#e05a5a}
+.sb-out svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:52px;flex-shrink:0;border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:baseline;gap:10px}
+.tb-title{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400}
+.tb-sub{font-size:11px;color:var(--muted)}
+.tb-r{display:flex;align-items:center;gap:10px}
+.uc{display:flex;align-items:center;gap:7px}.ua{width:26px;height:26px;border-radius:50%;background:rgba(232,151,106,0.18);border:1px solid rgba(232,151,106,0.28);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--acc)}.un{font-size:11px;color:var(--muted)}
+.content{flex:1;overflow-y:auto;padding:16px 22px;display:flex;flex-direction:column;gap:16px}
+.sec-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px 24px}
+/* PROFILE HEADER */
+.profile-hdr{display:flex;align-items:center;gap:20px}
+.big-avatar{width:64px;height:64px;border-radius:50%;background:rgba(232,151,106,0.18);border:2px solid rgba(232,151,106,0.35);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--acc);flex-shrink:0}
+.profile-info{flex:1}
+.profile-name{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:4px}
+.profile-email{font-size:12px;color:var(--muted);margin-bottom:3px}
+.profile-since{font-size:11px;color:rgba(255,248,235,0.3);margin-bottom:8px}
+.profile-badge{display:inline-flex;padding:3px 10px;border-radius:20px;background:rgba(232,151,106,0.1);border:1px solid rgba(232,151,106,0.25);font-size:11px;color:var(--acc)}
+/* STAT STRIP */
+.stat-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ss-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.ss-n{font-family:'DM Serif Display',serif;font-size:20px;line-height:1}
+.ss-l{font-size:10px;color:var(--muted);margin-top:4px}
+/* FORM */
+.form-grid{display:flex;flex-direction:column;gap:14px}
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.field-input{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:border-color .2s}
+.field-input:focus{border-color:rgba(232,151,106,0.4)}
+.save-btn{width:100%;padding:10px;background:var(--acc);color:#1A1614;border:none;border-radius:9px;font-size:12px;font-weight:500;margin-top:4px;transition:opacity .2s}
+.save-btn:hover{opacity:.88}
+/* EMOTION PROFILE */
+.ep-pills{display:flex;flex-wrap:wrap;gap:8px}
+.ep-pill{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:24px;background:rgba(255,255,255,0.03);border:1px solid var(--border);font-size:12px;transition:border-color .2s}
+.ep-pill.dominant{border-color:rgba(232,151,106,0.4)}
+.ep-em{font-size:16px}
+.ep-name{color:rgba(255,248,235,0.8)}
+.ep-count{font-size:11px;color:var(--muted);margin-left:2px}
+/* DANGER ZONE */
+.danger-row{display:flex;gap:10px}
+.danger-btn{flex:1;padding:10px;border-radius:9px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.export-btn{background:transparent;border:1px solid var(--border);color:rgba(255,248,235,0.5)}
+.export-btn:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.delete-btn{background:transparent;border:1px solid rgba(224,90,90,0.2);color:rgba(224,90,90,0.6)}
+.delete-btn:hover{background:rgba(224,90,90,0.08);color:#e05a5a;border-color:rgba(224,90,90,0.4)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sb" id="sb">
+  <div class="sb-top"><div class="sb-paw" onclick="toggleSb()">🐾</div><span class="sb-brand">MeowMood</span></div>
+  <nav class="sb-nav">
+    <a href="./dashboard.html" class="sb-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg><span class="sb-lbl">Analyse</span></a>
+    <a href="./history.html" class="sb-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><span class="sb-lbl">History</span></a>
+    <a href="./metrics.html" class="sb-item"><svg viewBox="0 0 24 24"><rect x="3" y="14" width="4" height="7"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="4" width="4" height="17"/></svg><span class="sb-lbl">Metrics</span></a>
+    <button class="sb-item active" onclick="toggleSb()"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="sb-lbl">Profile</span></button>
+  </nav>
+  <div class="sb-bottom"><a href="./login.html" class="sb-out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="sb-lbl">Logout</span></a></div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="tb-l"><span class="tb-title">Profile</span><span class="tb-sub">Your account and preferences.</span></div>
+    <div class="tb-r"><div class="uc"><div class="ua">CL</div><span class="un">Cat Lover</span></div></div>
+  </header>
+  <div class="content">
+
+    <!-- Profile Header Card -->
+    <div class="card profile-hdr">
+      <div class="big-avatar">CL</div>
+      <div class="profile-info">
+        <div class="profile-name">Cat Lover</div>
+        <div class="profile-email">catlover@example.com</div>
+        <div class="profile-since">Member since March 2026</div>
+        <span class="profile-badge">🐾 Active member</span>
+      </div>
+    </div>
+
+    <!-- Stat Strip -->
+    <div class="stat-strip">
+      <div class="ss-card">
+        <div class="ss-n">24</div>
+        <div class="ss-l">🐾 Total analyses</div>
+      </div>
+      <div class="ss-card">
+        <div class="ss-n" style="color:#d4a017">😸 Happy</div>
+        <div class="ss-l">Most common emotion (34%)</div>
+      </div>
+      <div class="ss-card">
+        <div class="ss-n">Today</div>
+        <div class="ss-l">📅 Last active</div>
+      </div>
+    </div>
+
+    <!-- Account Details -->
+    <div>
+      <div class="sec-lbl">Account Details</div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-lbl">Display name</label>
+            <input class="field-input" type="text" value="Cat Lover">
+          </div>
+          <div class="field-group">
+            <label class="field-lbl">Email</label>
+            <input class="field-input" type="email" value="catlover@example.com">
+          </div>
+          <div class="field-group">
+            <label class="field-lbl">Password</label>
+            <input class="field-input" type="password" value="password123">
+          </div>
+          <button class="save-btn">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emotional Profile -->
+    <div>
+      <div class="sec-lbl">Your Cat's Emotional Profile</div>
+      <div class="card">
+        <div class="ep-pills">
+          <div class="ep-pill dominant">
+            <span class="ep-em">😸</span>
+            <span class="ep-name" style="color:#d4a017">Happy</span>
+            <span class="ep-count">· 8 times</span>
+          </div>
+          <div class="ep-pill">
+            <span class="ep-em">😾</span>
+            <span class="ep-name" style="color:#e05a5a">Angry</span>
+            <span class="ep-count">· 5 times</span>
+          </div>
+          <div class="ep-pill">
+            <span class="ep-em">😿</span>
+            <span class="ep-name" style="color:#6b9fd4">Sad</span>
+            <span class="ep-count">· 4 times</span>
+          </div>
+          <div class="ep-pill">
+            <span class="ep-em">😲</span>
+            <span class="ep-name" style="color:#34d399">Surprised</span>
+            <span class="ep-count">· 3 times</span>
+          </div>
+          <div class="ep-pill">
+            <span class="ep-em">🙀</span>
+            <span class="ep-name" style="color:#c084fc">Scared</span>
+            <span class="ep-count">· 2 times</span>
+          </div>
+          <div class="ep-pill">
+            <span class="ep-em">🐱</span>
+            <span class="ep-name" style="color:#9b8fd4">Other</span>
+            <span class="ep-count">· 2 times</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div>
+      <div class="sec-lbl">Account</div>
+      <div class="card" style="padding:16px 20px">
+        <div class="danger-row">
+          <button class="danger-btn export-btn">Export my data</button>
+          <button class="danger-btn delete-btn">Delete account</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<script>
+const C={happy:'#d4a017',sad:'#6b9fd4',angry:'#e05a5a',scared:'#c084fc',surprised:'#34d399',other:'#9b8fd4'};
+const EM={happy:'😸 Happy',sad:'😿 Sad',angry:'😾 Angry',scared:'🙀 Scared',surprised:'😲 Surprised',other:'🐱 Other'};
+
+function toggleSb(){document.getElementById('sb').classList.toggle('open')}
+
+function showNotification(msg, type='success') {
+  const f = document.createElement('div');
+  f.style = `position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;background:${type==='success'?'#10b981':'#ef4444'};color:white;z-index:10000;font-size:13px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);`;
+  f.textContent = msg;
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(), 3000);
+}
+
+async function init() {
+  try {
+    const uRes = await fetch('/api/user', {credentials: 'include'});
+    if (uRes.status === 401) { window.location.href = './login.html'; return; }
+    const user = await uRes.json();
+    
+    // Fix 4a & 4b: Sync display locations
+    const initials = user.name.split(' ').map(n=>n[0]).join('').toUpperCase();
+    document.querySelectorAll('.ua, .big-avatar').forEach(el=>el.textContent=initials);
+    document.querySelectorAll('.un, .profile-name').forEach(el=>el.textContent=user.name);
+    document.querySelector('.profile-email').textContent = user.email;
+
+    // Set Form values
+    const fields = document.querySelectorAll('.field-input');
+    if(fields.length >= 3) {
+      fields[0].value = user.name;
+      fields[1].value = user.email;
+      fields[2].value = ''; // Fix 4c: Clear hardcoded password
+    }
+
+    // Fix 4d: Member since
+    const memberSince = document.querySelector('.member-since');
+    if (memberSince) {
+      const date = new Date();
+      memberSince.textContent = 'Member since ' + date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    // Get Stats
+    const sRes = await fetch('/api/stats', {credentials: 'include'});
+    const stats = await sRes.json();
+    const ssNs = document.querySelectorAll('.ss-n');
+    if(ssNs.length >= 3) {
+      ssNs[0].textContent = stats.total_predictions;
+      
+      const dist = stats.emotion_distribution;
+      let maxEm = 'happy', maxVal = -1;
+      for(let k in dist) if(dist[k] > maxVal) { maxVal = dist[k]; maxEm = k.toLowerCase(); }
+      
+      ssNs[1].textContent = EM[maxEm] || 'None';
+      ssNs[1].style.color = C[maxEm];
+      document.querySelectorAll('.ss-l')[1].textContent = `Most common emotion (${Math.round((maxVal/(stats.total_predictions||1))*100)}%)`;
+      ssNs[2].textContent = stats.total_predictions > 0 ? 'Recently' : 'Never';
+    }
+
+    // Fix 4h: Emotional Profile pills from history
+    const epContainer = document.querySelector('.ep-pills');
+    if (epContainer) {
+      epContainer.innerHTML = '';
+      const hRes = await fetch('/api/history', {credentials: 'include'});
+      const history = await hRes.json();
+      const counts = {};
+      history.forEach(p => { counts[p.emotion] = (counts[p.emotion] || 0) + 1; });
+      
+      Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([em, count], i) => {
+        const k = em.toLowerCase();
+        const div = document.createElement('div');
+        div.className = 'ep-pill' + (i === 0 ? ' dominant' : '');
+        div.innerHTML = `
+          <span class="ep-em">${EM[k].split(' ')[0]}</span>
+          <span class="ep-name" style="color:${C[k]}">${EM[k].split(' ')[1]}</span>
+          <span class="ep-count">· ${count} times</span>
+        `;
+        epContainer.appendChild(div);
+      });
+    }
+
+  } catch (err) { console.error(err); }
+}
+
+// Fix 4e: Save changes
+document.querySelector('.save-btn')?.addEventListener('click', async () => {
+    const fields = document.querySelectorAll('.field-input');
+    const name = fields[0].value.trim();
+    const password = fields[2].value.trim();
+
+    try {
+      const res = await fetch('/api/update_profile', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotification('Profile updated! 🎉');
+        init();
+      } else {
+        showNotification(data.error || 'Update failed', 'danger');
+      }
+    } catch (err) { showNotification('Network error', 'danger'); }
+});
+
+// Fix 4f: Export data
+document.querySelector('.export-btn')?.addEventListener('click', async () => {
+    const res = await fetch('/api/history', {credentials: 'include'});
+    const data = await res.json();
+    const csv = [
+      'Date,Type,File,Emotion,Confidence',
+      ...data.map(p => `${p.timestamp},${p.file_type},${p.filename},${p.emotion},${p.confidence}`)
+    ].join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'meowmood_history.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// Fix 4g: Delete account
+document.querySelector('.delete-btn')?.addEventListener('click', async () => {
+  if (!confirm('Are you sure? This cannot be undone.')) return;
+  const res = await fetch('/api/delete_account', {method: 'POST', credentials: 'include'});
+  const data = await res.json();
+  if (data.success) window.location.href = '/login';
+});
+
+init();
+</script>
+</body>
+</html>
