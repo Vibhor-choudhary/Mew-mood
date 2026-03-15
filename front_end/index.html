@@ -125,13 +125,13 @@
         #layer-2 {
             top: 50%;
             transform: translateY(-50%);
-            left: clamp(4rem, 8vw, 10rem);
+            left: clamp(2rem, 4vw, 10rem);
         }
 
         #layer-2 h2,
         #layer-3 h2 {
             font-family: Georgia, serif;
-            font-size: clamp(2rem, 5vw, 4rem);
+            font-size: clamp(2rem, 11vw, 3rem);
             font-weight: 300;
             color: rgba(255, 248, 235, 0.90);
             line-height: 1.2;
@@ -145,7 +145,7 @@
         }
 
         #layer-4 {
-            top: 50%;
+            top: 75%;
             transform: translate(-50%, -50%);
             left: 50%;
             text-align: center;
@@ -340,7 +340,7 @@
 
         .emotion-card {
             background: rgba(255, 248, 235, 0.025);
-            border: 1px solid rgba(224, 90, 90, 0.16); 
+            border: 1px solid rgba(224, 90, 90, 0.16);
             border-radius: 14px;
             display: flex;
             flex-wrap: wrap;
@@ -431,6 +431,7 @@
                 border-radius: 0 0 14px 14px;
                 order: -1;
             }
+
             .emotion-col-left {
                 padding: 2rem;
             }
@@ -586,8 +587,15 @@
         }
 
         @keyframes mascotFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .ambient-glow {
@@ -718,6 +726,7 @@
             .step-cards-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
             .mascot-img {
                 width: 130px;
             }
@@ -844,6 +853,7 @@
         .cta-btn-big:active {
             transform: translateY(-1px);
         }
+
         footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-subtle);
@@ -882,7 +892,7 @@
             border: 1px solid rgba(255, 248, 235, 0.10);
             border-radius: 100px;
             padding: 0.6rem 0.75rem;
-            box-shadow: 
+            box-shadow:
                 0 4px 24px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 248, 235, 0.06);
             display: flex;
@@ -996,9 +1006,11 @@
             #navbar {
                 min-width: calc(100vw - 2.5rem);
             }
+
             .nav-hide-mobile {
                 display: none !important;
             }
+
             .nav-divider-mobile-hide {
                 display: none !important;
             }
@@ -1071,20 +1083,21 @@
         <!-- Section 3: Emotion Spectrum Component -->
         <section class="emotions-section" id="emotions-section">
             <div class="emotion-glow"></div>
-            
+
             <div class="spectrum-container">
                 <div class="spectrum-header">
                     <span class="section-label">What We Detect</span>
                     <h2>The Emotion Spectrum</h2>
                 </div>
-                
+
                 <div class="emotion-card" id="emotion-card">
                     <div class="emotion-col-left">
                         <div class="emotion-text-content" id="emotion-text-content">
                             <span class="emotion-micro">ANALYSIS RESULT</span>
                             <h3 class="emotion-name" id="emotion-name">Angry</h3>
-                            <p class="emotion-desc" id="emotion-desc">Dilated pupils, flattened ears, sharp short vocalisations. The cat feels threatened or is in active defence mode.</p>
-                            
+                            <p class="emotion-desc" id="emotion-desc">Dilated pupils, flattened ears, sharp short
+                                vocalisations. The cat feels threatened or is in active defence mode.</p>
+
                             <div class="confidence-container">
                                 <div class="confidence-label">
                                     <span>Confidence</span>
@@ -1096,7 +1109,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="emotion-col-right">
                         <div class="thumbnail-wrap">
                             <div class="thumbnail-frame">
@@ -1105,7 +1118,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="slider-container">
                     <div class="slider-track-wrap" id="slider-track-wrap">
                         <div class="slider-progress-wrapper" id="slider-fill" style="width: 0%;">
@@ -1129,9 +1142,9 @@
         <section id="see-it-in-action">
             <span class="section-label">SEE IT IN ACTION</span>
             <h2>Watch our AI understand your cat.</h2>
-            
+
             <div class="action-grid-new">
-                
+
                 <!-- Mascot Column -->
                 <div class="mascot-col">
                     <img src="./mascot.png" alt="MeowMood mascot" class="mascot-img">
@@ -1145,7 +1158,7 @@
 
                 <!-- Workflow Column -->
                 <div class="workflow-col">
-                    
+
                     <div class="progress-track-wrapper">
                         <div class="progress-track-bg">
                             <div class="progress-track-fill" id="wf-fill"></div>
@@ -1159,12 +1172,13 @@
                     </div>
 
                     <div class="step-cards-grid">
-                        
+
                         <div class="wf-step">
                             <div class="step-card" style="--step-color: #E8976A">
                                 <span class="step-emoji">📸</span>
                                 <h4 class="step-title">Drop your file</h4>
-                                <p class="step-desc">Upload a photo of your cat's face or a short audio clip of their meow.</p>
+                                <p class="step-desc">Upload a photo of your cat's face or a short audio clip of their
+                                    meow.</p>
                                 <span class="step-tech">Flask</span>
                             </div>
                         </div>
@@ -1173,7 +1187,8 @@
                             <div class="step-card" style="--step-color: #6b9fd4">
                                 <span class="step-emoji">🔍</span>
                                 <h4 class="step-title">AI reads the signals</h4>
-                                <p class="step-desc">The model scans facial features in images and frequency patterns in audio.</p>
+                                <p class="step-desc">The model scans facial features in images and frequency patterns in
+                                    audio.</p>
                                 <span class="step-tech">PyTorch · Librosa</span>
                             </div>
                         </div>
@@ -1182,7 +1197,8 @@
                             <div class="step-card" style="--step-color: #c084fc">
                                 <span class="step-emoji">🧠</span>
                                 <h4 class="step-title">Patterns are matched</h4>
-                                <p class="step-desc">Signals are compared against thousands of labelled cat behaviours.</p>
+                                <p class="step-desc">Signals are compared against thousands of labelled cat behaviours.
+                                </p>
                                 <span class="step-tech">ResNet18</span>
                             </div>
                         </div>
@@ -1191,13 +1207,14 @@
                             <div class="step-card" style="--step-color: #d4a017">
                                 <span class="step-emoji">✨</span>
                                 <h4 class="step-title">Emotion revealed</h4>
-                                <p class="step-desc">You get a clear emotion label and a confidence score. Instantly.</p>
+                                <p class="step-desc">You get a clear emotion label and a confidence score. Instantly.
+                                </p>
                                 <span class="step-tech">MeowMood</span>
                             </div>
                         </div>
 
                     </div>
-                    
+
                     <button class="replay-btn" id="wf-replay">&#8634; Replay</button>
 
                 </div>
@@ -1206,12 +1223,7 @@
 
         <!-- Section 5: Final CTA -->
         <section id="final-cta" style="position: relative; overflow: hidden;">
-            <video
-              autoplay
-              muted
-              loop
-              playsinline
-              style="
+            <video autoplay muted loop playsinline style="
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -1220,9 +1232,8 @@
                 object-fit: cover;
                 z-index: 0;
                 opacity: 0.45;
-              "
-            >
-              <source src="./video/KYC.mp4" type="video/mp4">
+              ">
+                <source src="./video/KYC.mp4" type="video/mp4">
             </video>
             <div style="
               position: absolute;
@@ -1232,7 +1243,7 @@
             "></div>
             <div class="cta-content" style="position: relative; z-index: 1;">
                 <h2 class="cta-heading">Know what your cat feels now.</h2>
-                <a href="/login?tab=register" class="cta-btn-big">Start now</a>
+                <a href="/register" class="cta-btn-big">Start now</a>
             </div>
         </section>
 
@@ -1435,7 +1446,7 @@
                             );
                             drawFrame(frameIndex);
                             updateOverlays(fraction);
-                            
+
                             // Navbar logic
                             const heroEndScroll = heroContainer.offsetHeight - window.innerHeight;
                             if (fraction >= 1.0 || window.scrollY >= heroContainer.offsetHeight) {
@@ -1529,32 +1540,32 @@
                 if (isAutoplay && !isDragging) {
                     currentProgress += dt / totalDuration;
                     if (currentProgress >= 1) currentProgress = 0;
-                    
+
                     let idx = Math.floor(currentProgress * 6);
                     if (idx >= 6) idx = 5;
-                    
+
                     setEmotion(idx);
                 }
-                
+
                 // Manually update the visual width each frame based on current progress natively
                 fillEl.style.width = (currentProgress * 100) + '%';
-                
+
                 requestAnimationFrame(animateSlider);
             };
 
             const trackWrap = document.getElementById('slider-track-wrap');
-            
+
             const handleInteract = (e) => {
                 const rect = trackWrap.getBoundingClientRect();
                 let x = e.clientX || (e.touches && e.touches[0].clientX);
                 if (x === undefined) return;
-                
+
                 let percent = (x - rect.left) / rect.width;
                 percent = Math.max(0, Math.min(1, percent));
-                
+
                 currentProgress = percent;
                 fillEl.style.width = (currentProgress * 100) + '%';
-                
+
                 let idx = Math.floor(percent * 6);
                 if (idx > 5) idx = 5;
                 setEmotion(idx);
@@ -1570,7 +1581,7 @@
             window.addEventListener('mouseup', () => {
                 isDragging = false;
             });
-            
+
             trackWrap.addEventListener('touchstart', (e) => {
                 isDragging = true;
                 handleInteract(e);
@@ -1626,7 +1637,7 @@
                 const resetSequence = () => {
                     timerTimeouts.forEach(t => clearTimeout(t));
                     timerTimeouts = [];
-                    
+
                     wfFill.style.transition = 'none';
                     wfFill.style.width = '0%';
                     wfDots.forEach(d => d.classList.remove('lit'));
