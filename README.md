@@ -200,4 +200,4 @@ The `/front_end/front_end_png/` directory contains cute cat GIFs and images used
 - `dance-dancing.gif` - Registration page
 - `cute-animated-cat-tutorial.gif` - Dashboard result display
 
-uilt with ❤️ for cat lovers and AI enthusiasts**
+**Built with ❤️ for cat lovers and AI enthusiasts**
