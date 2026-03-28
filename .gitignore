@@ -17,9 +17,6 @@ database/cat_emotion.db
 # ── User uploaded files ──
 uploads/
 
-# ── ML model weights ──
-backend/trained_modelimages/
-
 # ── Training scripts ──
 backend/models_training/
 
