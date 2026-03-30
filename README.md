@@ -1,3 +1,13 @@
+---
+title: MewMood
+emoji: 🐱
+colorFrom: orange
+colorTo: pink
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Cat Emotion Recognition System 🐱
 
 AI-based system for detecting cat emotions using facial (image) and vocal (audio) analysis.
@@ -61,7 +71,10 @@ cd path/to/project
 ### Step 2: Create Virtual Environment
 ```bash
 python -m venv .venv
+# On Windows:
 .venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
 ```
 
 ### Step 3: Install Dependencies
