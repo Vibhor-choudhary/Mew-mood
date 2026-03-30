@@ -554,8 +554,18 @@ def serve_media(filename):
     return send_from_directory(str(BASE_DIR / "front_end"), filename)
 
 
+FLASK_ROUTES = {
+    "login", "register", "logout", "dashboard", 
+    "profile", "update_profile", "metrics", "history", "ppt"
+}
+
 @app.route("/<path:filename>")
 def serve_frontend_file(filename):
+    # Don't intercept known Flask routes
+    top_level = filename.split("/")[0]
+    if top_level in FLASK_ROUTES or top_level.startswith("api"):
+        from flask import abort
+        abort(404)
     file_path = BASE_DIR / "front_end" / filename
     if file_path.exists():
         return send_from_directory(str(BASE_DIR / "front_end"), filename)
