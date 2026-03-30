@@ -556,7 +556,10 @@ def serve_media(filename):
 
 @app.route("/<path:filename>")
 def serve_frontend_file(filename):
-    return send_from_directory(str(BASE_DIR / "front_end"), filename)
+    file_path = BASE_DIR / "front_end" / filename
+    if file_path.exists():
+        return send_from_directory(str(BASE_DIR / "front_end"), filename)
+    return {"error": "Not found"}, 404
 
 
 # ==========================================
